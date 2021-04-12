@@ -32,11 +32,6 @@ double convertToDouble(int start, int end) {
     return neg? -num : num;
 }
 
-/**/ void printSubExpression(int start, int end) {
-/**/    for (int i = start; i < end; i++)
-/**/        printf("%c", *(expression + i));
-/**/}
-
 int isOperator(char i) {
     return i == '+' || i == '-' || i == '*' || i == '/' || i == '^' || i == '(';
 }
@@ -70,25 +65,25 @@ double evalExpression(int start, int end) {
     /* Split expression and apply the correct operations. Operations in ascending order of priority. */
     if (addSubLoc != -1) {
         if (*(expression + addSubLoc) == '+')
-            return evalExpression(start, addSubLoc) + evalExpression(addSubLoc + 1, end);   // ADD
+            return evalExpression(start, addSubLoc) + evalExpression(addSubLoc + 1, end);
         else
-            return evalExpression(start, addSubLoc) + evalExpression(addSubLoc, end);       // SUBTRACT
+            return evalExpression(start, addSubLoc) + evalExpression(addSubLoc, end);
     } else if (invMulLoc != -1) {
-        return evalExpression(start, invMulLoc) * evalExpression(invMulLoc, end);           // INVISIBLE '*'
+        return evalExpression(start, invMulLoc) * evalExpression(invMulLoc, end);
     }
     else if (mulDivLoc != -1) {
         if (*(expression + mulDivLoc) == '*')
-            return evalExpression(start, mulDivLoc) * evalExpression(mulDivLoc + 1, end);   // MULTIPLY
+            return evalExpression(start, mulDivLoc) * evalExpression(mulDivLoc + 1, end);
         else
-            return evalExpression(start, mulDivLoc) / evalExpression(mulDivLoc + 1, end);   // DIVIDE
+            return evalExpression(start, mulDivLoc) / evalExpression(mulDivLoc + 1, end);
     } else if (expLoc != -1) {
-        return pow(evalExpression(start, expLoc), evalExpression(expLoc + 1, end));         // POWER
+        return pow(evalExpression(start, expLoc), evalExpression(expLoc + 1, end));
     } else if (*(expression + start) == '(' && *(expression + end - 1) == ')') {
-        return evalExpression(start + 1, end - 1);                                          // PARENTHESIS
+        return evalExpression(start + 1, end - 1);
     }
 
     /* Convert operation-less expression from string to double. */
-    return convertToDouble(start, end);                                                     // NUMBER
+    return convertToDouble(start, end);
 }
 
 int main() {
