@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+D:/X/Codes/C/Calculator-C/Calculator-C/main.c
+stdio.h
+-
+stdlib.h
+-
+math.h
+-
+
