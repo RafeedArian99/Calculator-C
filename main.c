@@ -33,7 +33,7 @@ double convertToDouble(int start, int end) {
 }
 
 int isOperator(char i) {
-    return i == '+' || i == '-' || i == '*' || i == '/' || i == '^' || i == '(';
+    return i == '+' || i == '-' || i == '*' || i == '/' || i == '^' || i == '(' || i == 'n' || i == 's';
 }
 
 /**
@@ -90,8 +90,17 @@ double evalExpression(int start, int end, int opOrder) {
             return evalExpression(start, mulDivLoc, 2) / evalExpression(mulDivLoc + 1, end, 1);
     } else if (expLoc != -1) {
         return pow(evalExpression(start, expLoc, 3), evalExpression(expLoc + 1, end, 2));
-    } else if (*(expression + start) == '(' && *(expression + end - 1) == ')') {
-        return evalExpression(start + 1, end - 1, 0);
+    } else if (*(expression + end - 1) == ')') {
+        switch (*(expression + start)) {
+            case 's':
+                return sin(evalExpression(start + 4, end - 1, 0));
+            case 'c':
+                return cos(evalExpression(start + 4, end - 1, 0));
+            case 't':
+                return tan(evalExpression(start + 4, end - 1, 0));
+            default:
+                return evalExpression(start + 1, end - 1, 0);
+        }
     }
 
     // Convert operation-less expression from string to double.
