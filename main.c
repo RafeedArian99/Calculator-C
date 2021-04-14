@@ -12,11 +12,13 @@ void getLine(char** line, int* size)
 
     while (1) {
         c = (char) getc(stdin);
+
         if (c == EOF || c == '\n')
             break;
-
-        *line = realloc(*line, i + 2);
-        *(*line + i++) = c;
+        else if (c != ' ') {
+            *line = realloc(*line, i + 2);
+            *(*line + i++) = c;
+        }
     }
 
     *(*line + i) = '\0';
@@ -27,13 +29,23 @@ double convertToDouble(int start, int end) {
     double num = 0.0;
     int neg = *(expression + start) == '-';
     for (int i = neg ? start + 1 : start; i < end; i++)
-        num = num * 10 + *(expression + i) - '0';
+        if (*(expression + i) != ' ')
+            num = num * 10 + *(expression + i) - '0';
 
     return neg? -num : num;
 }
 
-int isOperator(char i) {
-    return i == '+' || i == '-' || i == '*' || i == '/' || i == '^' || i == '(' || i == 'n' || i == 's';
+int isOperatorOrFunction(char i) {
+    return (i == '+' || i == '-' || i == '*' || i == '/' || i == '^' || i == '(')
+    || (i >= 'A' && i <= 'Z') || (i >= 'a' && i <= 'z');
+}
+
+int compare(int start, int end, const char * func) {
+    for (int i = start; i < end; i++)
+        if (*(expression + i) != *(func + i - start))
+            return 0;
+
+    return 1;
 }
 
 /**
@@ -52,18 +64,19 @@ double evalExpression(int start, int end, int opOrder) {
     int invMulLoc = -1; // Location of operation-less multiplication. Example: 2(5+3).
     int mulDivLoc = -1; // Location of multiplication/division.
     int expLoc = -1;    // Location of exponent.
+    int funcLoc = -1;   // TODO: Implement
     int ignorable = 0;  // Flag for skipping over parenthetical bodies.
 
     // Find location of operations. Break if lowest priority operation is found.
     for (int i = start; i < end && addSubLoc == -1; i++) {
         if (*(expression + i) == '(') {
             ignorable++;
-            if (i > start && !isOperator(*(expression + i - 1)) && invMulLoc == -1)
+            if (i > start && !isOperatorOrFunction(*(expression + i - 1)) && invMulLoc == -1)
                 invMulLoc = i;
         } else if (*(expression + i) == ')')
             ignorable--;
 
-        else if (!ignorable) {
+        else if (!ignorable && *(expression + i) != ' ') {
             if (opOrder < 1 && *(expression + i) == '+' || (i > start && *(expression + i) == '-'))
                 addSubLoc = i;
             else if (opOrder < 2 && mulDivLoc == -1 && (*(expression + i) == '*' || *(expression + i) == '/'))
@@ -75,6 +88,7 @@ double evalExpression(int start, int end, int opOrder) {
 
     // Split expression into [left expression] [OP] [right expression] and evaluate the left and right expressions.
     // Operations in ascending order of priority top-to-bottom.
+    // TODO: Improve sin, cos, tan recognition, and add functionality for multivariable functions.
     if (addSubLoc != -1) {
         if (*(expression + addSubLoc) == '+')
             return evalExpression(start, addSubLoc, 1) + evalExpression(addSubLoc + 1, end, 0);
@@ -113,6 +127,5 @@ int main() {
 
     printf("Calculate:");
     getLine(&expression, expSize);
-
     printf("%s = %lf", expression, evalExpression(0, *expSize, 0));
 }
