@@ -28,9 +28,18 @@ void getLine(char** line, int* size)
 double convertToDouble(int start, int end) {
     double num = 0.0;
     int neg = *(expression + start) == '-';
-    for (int i = neg ? start + 1 : start; i < end; i++)
-        if (*(expression + i) != ' ')
-            num = num * 10 + *(expression + i) - '0';
+    int numPlaces = 0;
+
+    for (int i = neg ? start + 1 : start; i < end; i++) {
+        if (*(expression + i) != ' ') {
+            if (*(expression + i) == '.')
+                numPlaces++;
+            else if (numPlaces)
+                num += (*(expression + i) - '0') / pow(10, numPlaces++);
+            else
+                num = num * 10 + *(expression + i) - '0';
+        }
+    }
 
     return neg? -num : num;
 }
